@@ -5,74 +5,64 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IBKR Fundamental Analyzer</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{
-  --bg:#f6f8fb;--card:#fff;--line:#d9e2ec;--text:#1f2937;--muted:#667085;--blue:#1f4e78;
-  --header:#eaf2fb;--input:#fff2cc;--output:#e2f0d9;--ok:#dff3e4;--warn:#fff4ce;--bad:#ffd9d9
+  --bg:#f6f8fb; --card:#fff; --line:#d9e2ec; --text:#1f2937; --muted:#667085; --blue:#1f4e78;
+  --header:#eaf2fb; --input:#fff2cc; --output:#e2f0d9; --ok:#dff3e4; --warn:#fff4ce; --bad:#ffd9d9;
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
 header{background:var(--blue);color:#fff;padding:16px 18px}
-header h1{margin:0 0 4px 0;font-size:26px}
+header h1{margin:0 0 4px 0;font-size:25px}
 header p{margin:0;opacity:.95}
 main{padding:14px}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;background:#edf4fb;border-bottom:1px solid var(--line)}
 .tab{border:1px solid #bfd0e0;background:#fff;border-radius:10px;padding:10px 12px;cursor:pointer}
 .tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.panel{display:none}
-.panel.active{display:block}
+.panel{display:none}.panel.active{display:block}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 button,.import-label{border:1px solid #bfd0e0;background:#fff;padding:10px 12px;border-radius:10px;cursor:pointer}
 .import-label{display:inline-block}
-.data-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;table-layout:fixed}
-.data-table th,.data-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-.data-table th{background:var(--header);text-align:left}
-.data-table th:nth-child(2), .data-table td:nth-child(2){width:240px}
-.data-table input,.data-table textarea,textarea{
-  width:100%;
-  padding:10px 12px;
-  border:1px solid #d0d5dd;
-  border-radius:8px;
-  background:var(--input);
-  font-size:16px;
-  min-width:180px;
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:12px}
+.metric{font-size:28px;font-weight:700}
+.sub,.small{font-size:12px;color:var(--muted);margin-top:6px}
+.verdict{font-size:22px;font-weight:700}
+.ok{background:var(--ok)} .warn{background:var(--warn)} .bad{background:var(--bad)}
+.input-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:12px}
+.input-row{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+.input-row:last-child{border-bottom:none}
+.label strong{display:block;font-size:16px;margin-bottom:4px}
+.meta{font-size:12px;color:var(--muted);line-height:1.35}
+input,textarea{
+  width:100%;padding:12px 14px;border:1px solid #d0d5dd;border-radius:10px;background:var(--input);
+  font-size:18px; color:var(--text);
 }
 .value-input{
   text-align:right;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric:tabular-nums;
 }
-.value-hint{
-  margin-top:4px;
-  font-size:12px;
-  color:var(--muted);
-  text-align:right;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+.value-hint{margin-top:6px;font-size:12px;color:var(--muted);text-align:right;word-break:break-all}
+.data-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.data-table th,.data-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.data-table th{background:var(--header);text-align:left}
 .output{background:var(--output);font-weight:600}
-.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
-.metric{font-size:28px;font-weight:700}
-.sub{font-size:12px;color:var(--muted);margin-top:6px}
-.verdict{font-size:22px;font-weight:700}
-.ok{background:var(--ok)} .warn{background:var(--warn)} .bad{background:var(--bad)}
-.muted{color:var(--muted)}
-ul{margin:0;padding-left:18px} li{margin-bottom:6px}
-.small{font-size:12px;color:var(--muted)}
 .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef3f8;margin:4px 6px 0 0}
 @media (max-width:820px){
-  header h1{font-size:23px}
-  .data-table{font-size:14px}
-  .data-table th:nth-child(2), .data-table td:nth-child(2){width:210px}
-  .data-table input,.data-table textarea,textarea{min-width:160px}
+  header h1{font-size:22px}
+  .input-grid{grid-template-columns:1fr}
+  .input-row{grid-template-columns:1fr;gap:8px}
+  .toolbar{display:grid;grid-template-columns:1fr 1fr}
+  .toolbar > *{width:100%}
+  input,textarea{font-size:17px}
 }
 </style>
 </head>
 <body>
 <header>
   <h1>IBKR Fundamental Analyzer</h1>
-  <p>Inputs más anchos, alineados a la derecha y con vista completa del valor interpretado.</p>
+  <p>Versión móvil limpia. Inputs con letras habilitadas y diseño sin columnas amontonadas.</p>
 </header>
 
 <nav class="tabs">
@@ -93,7 +83,7 @@ ul{margin:0;padding-left:18px} li{margin-bottom:6px}
           <button id="parsePaste">Parsear texto</button>
           <button id="fillExample">Cargar ejemplo</button>
         </div>
-        <div class="small">Acepta 47.9b, 250m, 3.2k. Debajo de cada input se muestra el valor completo interpretado.</div>
+        <div class="small">Ahora los campos son de texto real. Podés escribir 47.9b, 250m, 3.2k.</div>
       </div>
       <div class="card">
         <h3>Empresas guardadas</h3>
@@ -112,27 +102,27 @@ ul{margin:0;padding-left:18px} li{margin-bottom:6px}
       <label class="import-label">Importar JSON <input id="importJson" type="file" accept=".json" hidden></label>
     </div>
 
-    <table class="data-table" id="ibkrTable">
-      <thead><tr><th>Campo (IBKR)</th><th>Valor</th><th>Unidad</th><th>Dónde aparece</th><th>Para qué sirve</th><th>Notas</th></tr></thead>
-      <tbody></tbody>
-    </table>
+    <div class="card">
+      <div id="ibkrForm" class="input-grid"></div>
+    </div>
   </section>
 
   <section id="tab-calc" class="panel">
-    <h2>Calculadora automática</h2>
-    <table class="data-table" id="calcTable">
-      <thead><tr><th>Métrica</th><th>Valor</th><th>Unidad</th><th>Cómo se obtiene</th><th>Interpretación</th></tr></thead>
-      <tbody></tbody>
-    </table>
+    <div class="card">
+      <h2>Calculadora automática</h2>
+      <table class="data-table" id="calcTable">
+        <thead><tr><th>Métrica</th><th>Valor</th><th>Unidad</th><th>Cómo se obtiene</th><th>Interpretación</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </section>
 
   <section id="tab-five" class="panel">
-    <h2>Carga a 5 años</h2>
-    <table class="data-table" id="fiveTable">
-      <thead><tr><th>Concepto</th><th>FY-4</th><th>FY-3</th><th>FY-2</th><th>FY-1</th><th>FY</th><th>Prom. 5 años</th></tr></thead>
-      <tbody></tbody>
-    </table>
-    <div class="cards">
+    <div class="card">
+      <h2>Carga a 5 años</h2>
+      <div id="fiveForm"></div>
+    </div>
+    <div class="cards" style="margin-top:12px">
       <div class="card"><h3>CAGR ventas 5 años</h3><div class="metric" id="cagr5">—</div></div>
       <div class="card"><h3>FCF / Ventas promedio 5 años</h3><div class="metric" id="fcfMargin5">—</div></div>
     </div>
@@ -148,11 +138,10 @@ ul{margin:0;padding-left:18px} li{margin-bottom:6px}
   </section>
 
   <section id="tab-help" class="panel">
-    <h2>De dónde sale cada dato en IBKR</h2>
-    <table class="data-table">
-      <thead><tr><th>Campo</th><th>Dónde aparece</th><th>Para qué se usa</th></tr></thead>
-      <tbody id="helpTable"></tbody>
-    </table>
+    <div class="card">
+      <h2>De dónde sale cada dato en IBKR</h2>
+      <div id="helpList"></div>
+    </div>
   </section>
 </main>
 
@@ -177,6 +166,7 @@ const fields = [
   ["Return On Investment (TTM)","percent","Empresa → Ratios → Management Effectiveness","ROI (IBKR)","Comparar con ROIC aprox."],
   ["WACC","percent","Manual","Costo de capital","IBKR no lo muestra en estas pantallas"]
 ];
+
 const pasteMap = [
   {patterns:[/revenue/i,/total revenue/i], field:"Total Revenue (TTM)"},
   {patterns:[/ebit/i], field:"EBIT (TTM)"},
@@ -194,7 +184,9 @@ const pasteMap = [
   {patterns:[/free op\. cash flow\/rev/i], field:"Free Op. Cash Flow/Rev. (TTM)"},
   {patterns:[/net debt/i], field:"Net Debt - LFI (TTM)"}
 ];
+
 const fiveRows = [["Revenue (Ventas)","number"],["Free Cash Flow","number"],["EBIT","number"],["Tax Rate","percent"],["FCF / Ventas","formula"]];
+
 const exampleData = {
   "Empresa":"Coca-Cola","Total Revenue (TTM)":"47.94b","Ventas año anterior":"47.06b","EBIT (TTM)":"14.98b","Tax Rate (LFY)":"17.88",
   "Total Current Assets (LFY)":"31.04b","Total Current Liabilities (LFY)":"21.28b","Total Inventory (LFY)":"4.42b","CSH (LFY)":"15.81b",
@@ -202,12 +194,16 @@ const exampleData = {
   "Net Debt - LFI (TTM)":"29.69b","Free Op. Cash Flow/Rev. (TTM)":"-7.27","Return On Avg Assets (TTM)":"12.79",
   "Return On Avg Equity (TTM)":"45.97","Return On Investment (TTM)":"16.93","WACC":"8"
 };
-const state = JSON.parse(localStorage.getItem("ibkr_width_upgrade_state") || "{}");
-state.ibkr = state.ibkr || {}; state.five = state.five || {}; state.saved = state.saved || {};
-function save(){ localStorage.setItem("ibkr_width_upgrade_state", JSON.stringify(state)); }
+
+const state = JSON.parse(localStorage.getItem("ibkr_mobile_clean_fix_state") || "{}");
+state.ibkr = state.ibkr || {};
+state.five = state.five || {};
+state.saved = state.saved || {};
+
+function save(){ localStorage.setItem("ibkr_mobile_clean_fix_state", JSON.stringify(state)); }
+
 function parseHumanNumber(v){
   if (v === "" || v === null || v === undefined) return null;
-  if (typeof v === "number") return Number.isFinite(v) ? v : null;
   let s = String(v).trim().toLowerCase().replace(/,/g,"");
   if (!s) return null;
   s = s.replace(/usd/g,"").replace(/%/g,"").trim();
@@ -218,15 +214,18 @@ function parseHumanNumber(v){
   const n = Number(s);
   return Number.isFinite(n) ? n * mult : null;
 }
+
 function formatFullValue(v, kind){
   const n = parseHumanNumber(v);
   if (n == null) return "";
-  if (kind === "percent") return `${n}%`;
-  return new Intl.NumberFormat("en-US", {maximumFractionDigits: 2}).format(n);
+  if (kind === "percent") return n + "%";
+  return new Intl.NumberFormat("en-US", {maximumFractionDigits:2}).format(n);
 }
+
 function fmtUSD(v){ if (v == null || Number.isNaN(v)) return "—"; return new Intl.NumberFormat("es-AR",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(v); }
 function fmtPct(v){ if (v == null || Number.isNaN(v)) return "—"; return v.toFixed(2) + "%"; }
 function avg(arr){ const vals = arr.filter(v => v != null && !Number.isNaN(v)); return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null; }
+
 function interpret(metric, v){
   if (metric === "Empresa") return "Nombre cargado";
   if (v == null || Number.isNaN(v)) return "";
@@ -247,13 +246,27 @@ function interpret(metric, v){
   if (metric === "ROE (IBKR)") return v > 20 ? "Muy rentable para accionistas" : v >= 15 ? "Buena rentabilidad" : v >= 10 ? "Rentabilidad aceptable" : "Rentabilidad baja";
   return "";
 }
+
 function calculate(){
   const get = k => parseHumanNumber(state.ibkr[k]);
-  const sales = get("Total Revenue (TTM)"), salesPrev = get("Ventas año anterior"), ebit = get("EBIT (TTM)");
-  const tax = get("Tax Rate (LFY)"), currentAssets = get("Total Current Assets (LFY)"), currentLiab = get("Total Current Liabilities (LFY)");
-  const inventory = get("Total Inventory (LFY)"), cash = get("CSH (LFY)"), debt = get("Total Debt (LFY)"), equity = get("Total Equity (TTM) o Average Total Equity (TTM)");
-  const fcf = get("Free Cash Flow (LFY)"), netDebtIbkr = get("Net Debt - LFI (TTM)"), fcfSalesIbkr = get("Free Op. Cash Flow/Rev. (TTM)");
-  const roiIbkr = get("Return On Investment (TTM)"), roaIbkr = get("Return On Avg Assets (TTM)"), roeIbkr = get("Return On Avg Equity (TTM)"), wacc = get("WACC");
+  const sales = get("Total Revenue (TTM)");
+  const salesPrev = get("Ventas año anterior");
+  const ebit = get("EBIT (TTM)");
+  const tax = get("Tax Rate (LFY)");
+  const currentAssets = get("Total Current Assets (LFY)");
+  const currentLiab = get("Total Current Liabilities (LFY)");
+  const inventory = get("Total Inventory (LFY)");
+  const cash = get("CSH (LFY)");
+  const debt = get("Total Debt (LFY)");
+  const equity = get("Total Equity (TTM) o Average Total Equity (TTM)");
+  const fcf = get("Free Cash Flow (LFY)");
+  const netDebtIbkr = get("Net Debt - LFI (TTM)");
+  const fcfSalesIbkr = get("Free Op. Cash Flow/Rev. (TTM)");
+  const roiIbkr = get("Return On Investment (TTM)");
+  const roaIbkr = get("Return On Avg Assets (TTM)");
+  const roeIbkr = get("Return On Avg Equity (TTM)");
+  const wacc = get("WACC");
+
   const nwc = (currentAssets != null && currentLiab != null) ? currentAssets - currentLiab : null;
   const netDebt = (debt != null && cash != null) ? debt - cash : null;
   const invSales = (inventory != null && sales) ? inventory / sales * 100 : null;
@@ -266,76 +279,109 @@ function calculate(){
   const roicVsRoi = (roic != null && roiIbkr != null) ? roic - roiIbkr : null;
   return {empresa: state.ibkr["Empresa"] || "—", nwc, netDebt, invSales, fcfSales, growth, nopat, capitalInv, roic, roicWacc, roiIbkr, roaIbkr, roeIbkr, fcfSalesIbkr, netDebtIbkr, roicVsRoi};
 }
+
 function renderIBKR(){
-  const tb = document.querySelector("#ibkrTable tbody"), helpTb = document.querySelector("#helpTable");
-  tb.innerHTML = ""; helpTb.innerHTML = "";
+  const form = document.getElementById("ibkrForm");
+  const helpList = document.getElementById("helpList");
+  form.innerHTML = "";
+  helpList.innerHTML = "";
   fields.forEach(([name,type,section,purpose,note])=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${name}</td><td></td><td>${type==="percent"?"%":type==="number"?"USD":"texto"}</td><td>${section}</td><td>${purpose}</td><td>${note}</td>`;
-    const td = tr.children[1];
-    const wrap = document.createElement("div");
+    const row = document.createElement("div");
+    row.className = "input-row";
+
+    const left = document.createElement("div");
+    left.className = "label";
+    left.innerHTML = `<strong>${name}</strong><div class="meta">${type==="percent"?"Unidad: %":type==="number"?"Unidad: USD":"Texto"} · ${section}<br>${purpose}<br>${note}</div>`;
+
+    const right = document.createElement("div");
     const input = document.createElement("input");
     input.type = "text";
-    input.inputMode = type === "text" ? "text" : "decimal";
-    input.placeholder = type === "number" ? "ej: 47.9b" : "";
+    input.inputMode = "text"; // KEY FIX: letras habilitadas en iPhone
+    input.autocapitalize = "off";
+    input.autocorrect = "off";
+    input.spellcheck = false;
     input.className = "value-input";
+    input.placeholder = type === "number" ? "ej: 47.9b" : type === "percent" ? "ej: 17.8" : "";
     input.value = state.ibkr[name] ?? "";
-    input.addEventListener("input", e => { state.ibkr[name] = e.target.value; save(); hint.textContent = formatFullValue(e.target.value, type); });
+
     const hint = document.createElement("div");
     hint.className = "value-hint";
     hint.textContent = formatFullValue(state.ibkr[name], type);
-    wrap.appendChild(input); wrap.appendChild(hint); td.appendChild(wrap); tb.appendChild(tr);
 
-    const trHelp = document.createElement("tr");
-    trHelp.innerHTML = `<td>${name}</td><td>${section}</td><td>${purpose}</td>`;
-    helpTb.appendChild(trHelp);
+    input.addEventListener("input", e => {
+      state.ibkr[name] = e.target.value;
+      save();
+      hint.textContent = formatFullValue(e.target.value, type);
+    });
+
+    right.appendChild(input);
+    right.appendChild(hint);
+    row.appendChild(left);
+    row.appendChild(right);
+    form.appendChild(row);
+
+    const h = document.createElement("div");
+    h.style.padding = "8px 0";
+    h.style.borderBottom = "1px solid var(--line)";
+    h.innerHTML = `<strong>${name}</strong><div class="small">${section}<br>${purpose}</div>`;
+    helpList.appendChild(h);
   });
 }
-function renderCalc(){
-  const m = calculate();
-  const rows = [
-    ["Empresa", m.empresa, "texto", "Nombre"],["Capital circulante neto", m.nwc, "USD", "Current Assets − Current Liabilities"],
-    ["Deuda neta", m.netDebt, "USD", "Total Debt − Cash"],["Deuda neta (IBKR directa)", m.netDebtIbkr, "USD", "Net Debt - LFI (TTM)"],
-    ["Inventarios / Ventas", m.invSales, "%", "Inventory ÷ Revenue"],["FCF / Ventas", m.fcfSales, "%", "Free Cash Flow ÷ Revenue"],
-    ["FCF / Ventas (IBKR directo)", m.fcfSalesIbkr, "%", "Free Op. Cash Flow/Rev. (TTM)"],["Crecimiento ingresos YoY", m.growth, "%", "Ventas TTM vs. año anterior"],
-    ["NOPAT", m.nopat, "USD", "EBIT × (1 − Tax Rate)"],["Capital invertido aprox.", m.capitalInv, "USD", "Debt + Equity − Cash"],
-    ["ROIC aprox.", m.roic, "%", "NOPAT ÷ Capital invertido"],["ROI (IBKR)", m.roiIbkr, "%", "Return On Investment (TTM)"],
-    ["ROIC − WACC", m.roicWacc, "%", "ROIC aprox. − WACC"],["ROIC aprox. − ROI (IBKR)", m.roicVsRoi, "%", "Comparación"],
-    ["ROA (IBKR)", m.roaIbkr, "%", "Return On Avg Assets (TTM)"],["ROE (IBKR)", m.roeIbkr, "%", "Return On Avg Equity (TTM)"]
-  ];
-  const tb = document.querySelector("#calcTable tbody"); tb.innerHTML = "";
-  rows.forEach(([label,val,unit,how])=>{
-    const tr = document.createElement("tr");
-    let shown = unit === "USD" ? fmtUSD(val) : unit === "%" ? fmtPct(val) : (val ?? "—");
-    tr.innerHTML = `<td>${label}</td><td class="output">${shown}</td><td>${unit}</td><td>${how}</td><td>${interpret(label, val)}</td>`;
-    tb.appendChild(tr);
-  });
-}
+
 function renderFive(){
-  const tb = document.querySelector("#fiveTable tbody"); tb.innerHTML = "";
+  const form = document.getElementById("fiveForm");
+  form.innerHTML = "";
   fiveRows.forEach(([name,type])=>{
-    const tr = document.createElement("tr"); tr.innerHTML = `<td>${name}</td>`;
+    const row = document.createElement("div");
+    row.className = "input-row";
+    const left = document.createElement("div");
+    left.className = "label";
+    left.innerHTML = `<strong>${name}</strong><div class="meta">${type==="formula"?"Calculado automáticamente":"Cargar FY-4 a FY"}</div>`;
+    const right = document.createElement("div");
+
     if (type === "formula"){
       const fcf = [0,1,2,3,4].map(i => parseHumanNumber(state.five[`Free Cash Flow_${i}`]));
       const rev = [0,1,2,3,4].map(i => parseHumanNumber(state.five[`Revenue (Ventas)_${i}`]));
       const ratios = fcf.map((f,i) => (f != null && rev[i]) ? f / rev[i] * 100 : null);
-      ratios.forEach(v => tr.innerHTML += `<td class="output">${fmtPct(v)}</td>`);
-      tr.innerHTML += `<td class="output">${fmtPct(avg(ratios))}</td>`;
+      right.innerHTML = ratios.map((v,i)=>`<div class="small">FY-${4-i}: ${fmtPct(v)}</div>`).join("") + `<div><strong>Promedio: ${fmtPct(avg(ratios))}</strong></div>`;
     } else {
       [0,1,2,3,4].forEach(i=>{
-        const td = document.createElement("td"), wrap = document.createElement("div"), input = document.createElement("input"), hint = document.createElement("div");
-        input.type = "text"; input.inputMode = "decimal"; input.className = "value-input"; input.placeholder = type === "number" ? "ej: 12.5b" : "ej: 17.8";
+        const wrap = document.createElement("div");
+        wrap.style.marginBottom = "8px";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.inputMode = "text";
+        input.autocapitalize = "off";
+        input.autocorrect = "off";
+        input.spellcheck = false;
+        input.className = "value-input";
+        input.placeholder = type === "number" ? `FY-${4-i} ej: 12.5b` : `FY-${4-i} ej: 17.8`;
         input.value = state.five[`${name}_${i}`] ?? "";
-        hint.className = "value-hint"; hint.textContent = formatFullValue(state.five[`${name}_${i}`], type);
-        input.addEventListener("input", e=>{ state.five[`${name}_${i}`] = e.target.value; save(); hint.textContent = formatFullValue(e.target.value, type); });
-        wrap.appendChild(input); wrap.appendChild(hint); td.appendChild(wrap); tr.appendChild(td);
+        const hint = document.createElement("div");
+        hint.className = "value-hint";
+        hint.textContent = formatFullValue(state.five[`${name}_${i}`], type);
+        input.addEventListener("input", e=>{
+          state.five[`${name}_${i}`] = e.target.value;
+          save();
+          hint.textContent = formatFullValue(e.target.value, type);
+        });
+        wrap.appendChild(input);
+        wrap.appendChild(hint);
+        right.appendChild(wrap);
       });
-      const values = [0,1,2,3,4].map(i => parseHumanNumber(state.five[`${name}_${i}`]));
-      const tdAvg = document.createElement("td"); tdAvg.className = "output"; tdAvg.textContent = type === "percent" ? fmtPct(avg(values)) : fmtUSD(avg(values)); tr.appendChild(tdAvg);
+      const vals = [0,1,2,3,4].map(i => parseHumanNumber(state.five[`${name}_${i}`]));
+      const avgDiv = document.createElement("div");
+      avgDiv.innerHTML = `<strong>Promedio: ${type==="percent"?fmtPct(avg(vals)):fmtUSD(avg(vals))}</strong>`;
+      right.appendChild(avgDiv);
     }
-    tb.appendChild(tr);
+
+    row.appendChild(left);
+    row.appendChild(right);
+    form.appendChild(row);
   });
-  const rev0 = parseHumanNumber(state.five["Revenue (Ventas)_0"]), rev4 = parseHumanNumber(state.five["Revenue (Ventas)_4"]);
+
+  const rev0 = parseHumanNumber(state.five["Revenue (Ventas)_0"]);
+  const rev4 = parseHumanNumber(state.five["Revenue (Ventas)_4"]);
   const cagr = (rev0 && rev4) ? ((rev4 / rev0) ** (1/4) - 1) * 100 : null;
   const fcfVals = [0,1,2,3,4].map(i => parseHumanNumber(state.five[`Free Cash Flow_${i}`]));
   const revVals = [0,1,2,3,4].map(i => parseHumanNumber(state.five[`Revenue (Ventas)_${i}`]));
@@ -343,6 +389,37 @@ function renderFive(){
   document.getElementById("cagr5").textContent = fmtPct(cagr);
   document.getElementById("fcfMargin5").textContent = fmtPct(avg(fcfMargins));
 }
+
+function renderCalc(){
+  const m = calculate();
+  const rows = [
+    ["Empresa", m.empresa, "texto", "Nombre"],
+    ["Capital circulante neto", m.nwc, "USD", "Current Assets − Current Liabilities"],
+    ["Deuda neta", m.netDebt, "USD", "Total Debt − Cash"],
+    ["Deuda neta (IBKR directa)", m.netDebtIbkr, "USD", "Net Debt - LFI (TTM)"],
+    ["Inventarios / Ventas", m.invSales, "%", "Inventory ÷ Revenue"],
+    ["FCF / Ventas", m.fcfSales, "%", "Free Cash Flow ÷ Revenue"],
+    ["FCF / Ventas (IBKR directo)", m.fcfSalesIbkr, "%", "Free Op. Cash Flow/Rev. (TTM)"],
+    ["Crecimiento ingresos YoY", m.growth, "%", "Ventas TTM vs. año anterior"],
+    ["NOPAT", m.nopat, "USD", "EBIT × (1 − Tax Rate)"],
+    ["Capital invertido aprox.", m.capitalInv, "USD", "Debt + Equity − Cash"],
+    ["ROIC aprox.", m.roic, "%", "NOPAT ÷ Capital invertido"],
+    ["ROI (IBKR)", m.roiIbkr, "%", "Return On Investment (TTM)"],
+    ["ROIC − WACC", m.roicWacc, "%", "ROIC aprox. − WACC"],
+    ["ROIC aprox. − ROI (IBKR)", m.roicVsRoi, "%", "Comparación"],
+    ["ROA (IBKR)", m.roaIbkr, "%", "Return On Avg Assets (TTM)"],
+    ["ROE (IBKR)", m.roeIbkr, "%", "Return On Avg Equity (TTM)"]
+  ];
+  const tb = document.querySelector("#calcTable tbody");
+  tb.innerHTML = "";
+  rows.forEach(([label,val,unit,how])=>{
+    const tr = document.createElement("tr");
+    let shown = unit === "USD" ? fmtUSD(val) : unit === "%" ? fmtPct(val) : (val ?? "—");
+    tr.innerHTML = `<td>${label}</td><td class="output">${shown}</td><td>${unit}</td><td>${how}</td><td>${interpret(label, val)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
 function statusClass(kind, value){
   if (value == null) return "";
   if (kind === "roic") return value > 20 ? "ok" : value >= 15 ? "warn" : "bad";
@@ -353,22 +430,38 @@ function statusClass(kind, value){
   if (kind === "roa") return value > 10 ? "ok" : value >= 5 ? "warn" : "bad";
   return "";
 }
+
 function renderSummary(){
   const m = calculate();
-  const cards = [["Empresa", m.empresa, "text", ""],["ROIC aprox.", m.roic, "%", statusClass("roic", m.roic)],["ROI (IBKR)", m.roiIbkr, "%", ""],["FCF / Ventas", m.fcfSales, "%", statusClass("fcf", m.fcfSales)],["Deuda neta", m.netDebt, "USD", statusClass("debt", m.netDebt)],["Crec. ingresos YoY", m.growth, "%", statusClass("growth", m.growth)],["ROE (IBKR)", m.roeIbkr, "%", statusClass("roe", m.roeIbkr)],["ROA (IBKR)", m.roaIbkr, "%", statusClass("roa", m.roaIbkr)]];
-  const wrap = document.getElementById("summaryCards"); wrap.innerHTML = "";
+  const cards = [
+    ["Empresa", m.empresa, "text", ""],
+    ["ROIC aprox.", m.roic, "%", statusClass("roic", m.roic)],
+    ["ROI (IBKR)", m.roiIbkr, "%", ""],
+    ["FCF / Ventas", m.fcfSales, "%", statusClass("fcf", m.fcfSales)],
+    ["Deuda neta", m.netDebt, "USD", statusClass("debt", m.netDebt)],
+    ["Crec. ingresos YoY", m.growth, "%", statusClass("growth", m.growth)],
+    ["ROE (IBKR)", m.roeIbkr, "%", statusClass("roe", m.roeIbkr)],
+    ["ROA (IBKR)", m.roaIbkr, "%", statusClass("roa", m.roaIbkr)]
+  ];
+  const wrap = document.getElementById("summaryCards");
+  wrap.innerHTML = "";
   cards.forEach(([label,val,unit,klass])=>{
-    const div = document.createElement("div"); div.className = `card ${klass}`;
+    const div = document.createElement("div");
+    div.className = `card ${klass}`;
     let shown = unit === "USD" ? fmtUSD(val) : unit === "%" ? fmtPct(val) : (val || "—");
-    div.innerHTML = `<h3>${label}</h3><div class="metric">${shown}</div>`; wrap.appendChild(div);
+    div.innerHTML = `<h3>${label}</h3><div class="metric">${shown}</div>`;
+    wrap.appendChild(div);
   });
+
   let verdict = "Completar datos", vClass = "";
   if ([m.roic, m.fcfSales, m.netDebt, m.growth].every(v => v != null && !Number.isNaN(v))){
     if (m.roic > 20 && m.fcfSales > 15 && m.netDebt <= 0 && m.growth > 10){ verdict = "Empresa extraordinaria"; vClass = "ok"; }
     else if (m.roic > 15 && m.fcfSales > 10){ verdict = "Empresa buena"; vClass = "warn"; }
     else { verdict = "Revisar mejor"; vClass = "bad"; }
   }
-  document.getElementById("verdict").textContent = verdict; document.getElementById("verdict").className = `verdict ${vClass}`;
+  document.getElementById("verdict").textContent = verdict;
+  document.getElementById("verdict").className = `verdict ${vClass}`;
+
   let score = 0;
   if (m.roic != null){ if (m.roic > 20) score += 2; else if (m.roic >= 15) score += 1; }
   if (m.fcfSales != null){ if (m.fcfSales > 15) score += 2; else if (m.fcfSales >= 10) score += 1; }
@@ -378,24 +471,53 @@ function renderSummary(){
   if (m.roaIbkr != null && m.roaIbkr > 10) score += 1;
   document.getElementById("score").textContent = `${score}/10`;
   document.getElementById("scoreText").textContent = score >= 8 ? "Perfil de calidad alto" : score >= 5 ? "Perfil intermedio" : "Perfil flojo o incompleto";
-  const traffic = [["ROIC aprox.", m.roic, m.roic > 20 ? "🟢" : m.roic >= 15 ? "🟡" : "🔴"],["FCF / Ventas", m.fcfSales, m.fcfSales > 15 ? "🟢" : m.fcfSales >= 10 ? "🟡" : "🔴"],["Deuda neta", m.netDebt, m.netDebt <= 0 ? "🟢" : "🟡"],["Crec. ingresos YoY", m.growth, m.growth > 10 ? "🟢" : m.growth >= 5 ? "🟡" : "🔴"],["ROE (IBKR)", m.roeIbkr, m.roeIbkr > 20 ? "🟢" : m.roeIbkr >= 15 ? "🟡" : "🔴"],["ROA (IBKR)", m.roaIbkr, m.roaIbkr > 10 ? "🟢" : m.roaIbkr >= 5 ? "🟡" : "🔴"]];
-  const ul = document.getElementById("trafficList"); ul.innerHTML = "";
-  traffic.forEach(([label,val,stat])=>{ const li = document.createElement("li"); li.textContent = `${stat} ${label}: ${label.includes("Deuda") ? fmtUSD(val) : fmtPct(val)}`; ul.appendChild(li); });
+
+  const traffic = [
+    ["ROIC aprox.", m.roic, m.roic > 20 ? "🟢" : m.roic >= 15 ? "🟡" : "🔴"],
+    ["FCF / Ventas", m.fcfSales, m.fcfSales > 15 ? "🟢" : m.fcfSales >= 10 ? "🟡" : "🔴"],
+    ["Deuda neta", m.netDebt, m.netDebt <= 0 ? "🟢" : "🟡"],
+    ["Crec. ingresos YoY", m.growth, m.growth > 10 ? "🟢" : m.growth >= 5 ? "🟡" : "🔴"],
+    ["ROE (IBKR)", m.roeIbkr, m.roeIbkr > 20 ? "🟢" : m.roeIbkr >= 15 ? "🟡" : "🔴"],
+    ["ROA (IBKR)", m.roaIbkr, m.roaIbkr > 10 ? "🟢" : m.roaIbkr >= 5 ? "🟡" : "🔴"]
+  ];
+  const ul = document.getElementById("trafficList");
+  ul.innerHTML = "";
+  traffic.forEach(([label,val,stat])=>{
+    const li = document.createElement("li");
+    li.textContent = `${stat} ${label}: ${label.includes("Deuda") ? fmtUSD(val) : fmtPct(val)}`;
+    ul.appendChild(li);
+  });
 }
+
 function renderSavedCompanies(){
-  const box = document.getElementById("savedCompanies"); box.innerHTML = "";
+  const box = document.getElementById("savedCompanies");
+  box.innerHTML = "";
   const names = Object.keys(state.saved).sort();
   if (!names.length) { box.innerHTML = '<div class="small">Todavía no guardaste empresas.</div>'; return; }
   names.forEach(name=>{
-    const wrap = document.createElement("div"); wrap.className = "pill";
+    const wrap = document.createElement("div");
+    wrap.className = "pill";
     wrap.innerHTML = `${name} <button data-load="${name}" style="margin-left:6px;padding:2px 6px">Abrir</button> <button data-del="${name}" style="margin-left:4px;padding:2px 6px">X</button>`;
     box.appendChild(wrap);
   });
-  box.querySelectorAll("[data-load]").forEach(btn=>btn.addEventListener("click", ()=>{ const name = btn.getAttribute("data-load"); state.ibkr = {...state.saved[name].ibkr}; state.five = {...state.saved[name].five}; save(); renderAll(); }));
-  box.querySelectorAll("[data-del]").forEach(btn=>btn.addEventListener("click", ()=>{ const name = btn.getAttribute("data-del"); delete state.saved[name]; save(); renderSavedCompanies(); }));
+  box.querySelectorAll("[data-load]").forEach(btn=>btn.addEventListener("click", ()=>{
+    const name = btn.getAttribute("data-load");
+    state.ibkr = {...state.saved[name].ibkr};
+    state.five = {...state.saved[name].five};
+    save();
+    renderAll();
+  }));
+  box.querySelectorAll("[data-del]").forEach(btn=>btn.addEventListener("click", ()=>{
+    const name = btn.getAttribute("data-del");
+    delete state.saved[name];
+    save();
+    renderSavedCompanies();
+  }));
 }
+
 function parseQuickPaste(){
-  const txt = document.getElementById("quickPaste").value.trim(); if (!txt) return;
+  const txt = document.getElementById("quickPaste").value.trim();
+  if (!txt) return;
   const lines = txt.split(/\n+/);
   lines.forEach(line=>{
     for (const item of pasteMap){
@@ -405,18 +527,59 @@ function parseQuickPaste(){
       }
     }
   });
-  save(); renderAll();
+  save();
+  renderAll();
 }
-function renderAll(){ renderIBKR(); renderCalc(); renderFive(); renderSummary(); renderSavedCompanies(); }
-document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click", ()=>{ document.querySelectorAll(".tab").forEach(x => x.classList.remove("active")); document.querySelectorAll(".panel").forEach(x => x.classList.remove("active")); btn.classList.add("active"); document.getElementById("tab-" + btn.dataset.tab).classList.add("active"); if (btn.dataset.tab !== "ibkr") { renderCalc(); renderFive(); renderSummary(); }}));
+
+function renderAll(){
+  renderIBKR();
+  renderCalc();
+  renderFive();
+  renderSummary();
+  renderSavedCompanies();
+}
+
+document.querySelectorAll(".tab").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    if (btn.dataset.tab !== "ibkr") { renderCalc(); renderFive(); renderSummary(); }
+  });
+});
+
 document.getElementById("fillExample").addEventListener("click", ()=>{ state.ibkr = {...state.ibkr, ...exampleData}; save(); renderAll(); });
 document.getElementById("clearAll").addEventListener("click", ()=>{ state.ibkr = {}; state.five = {}; save(); renderAll(); });
 document.getElementById("refreshViews").addEventListener("click", ()=>{ renderCalc(); renderFive(); renderSummary(); });
-document.getElementById("exportJson").addEventListener("click", ()=>{ const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"}); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "ibkr_analyzer_data.json"; a.click(); });
+document.getElementById("exportJson").addEventListener("click", ()=>{
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ibkr_analyzer_data.json";
+  a.click();
+});
 document.querySelector(".import-label").addEventListener("click", ()=>{ document.getElementById("importJson").click(); });
-document.getElementById("importJson").addEventListener("change", async (e)=>{ const file = e.target.files[0]; if (!file) return; const txt = await file.text(); const obj = JSON.parse(txt); state.ibkr = obj.ibkr || {}; state.five = obj.five || {}; state.saved = obj.saved || state.saved || {}; save(); renderAll(); });
+document.getElementById("importJson").addEventListener("change", async (e)=>{
+  const file = e.target.files[0];
+  if (!file) return;
+  const txt = await file.text();
+  const obj = JSON.parse(txt);
+  state.ibkr = obj.ibkr || {};
+  state.five = obj.five || {};
+  state.saved = obj.saved || state.saved || {};
+  save();
+  renderAll();
+});
 document.getElementById("parsePaste").addEventListener("click", parseQuickPaste);
-document.getElementById("saveCompany").addEventListener("click", ()=>{ const name = document.getElementById("saveName").value.trim() || state.ibkr["Empresa"] || ""; if (!name) return; state.saved[name] = {ibkr:{...state.ibkr}, five:{...state.five}}; save(); renderSavedCompanies(); });
+document.getElementById("saveCompany").addEventListener("click", ()=>{
+  const name = document.getElementById("saveName").value.trim() || state.ibkr["Empresa"] || "";
+  if (!name) return;
+  state.saved[name] = {ibkr:{...state.ibkr}, five:{...state.five}};
+  save();
+  renderSavedCompanies();
+});
+
 renderAll();
 </script>
 </body>
