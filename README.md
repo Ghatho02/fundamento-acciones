@@ -1,20 +1,32 @@
+# IBKR Fundamental Analyzer
 
-# IBKR Fundamental Analyzer (Offline)
+Versión offline para subir a GitHub Pages.
 
-Herramienta offline para analizar empresas usando datos de Interactive Brokers (IBKR).
-
-Replica la lógica del Excel:
-
+## Qué hace
 - Capital circulante neto
 - Deuda neta
-- Inventarios / Ventas
-- FCF / Ventas
-- Crecimiento de ingresos YoY
-- CAGR ingresos 5 años
+- Inventarios / ventas
+- FCF / ventas
+- Crecimiento YoY
 - NOPAT
-- Capital invertido
-- ROIC
+- Capital invertido aprox.
+- ROIC aprox.
 - ROIC − WACC
-- Comparación ROIC vs ROI (IBKR)
+- Comparación con ROI de IBKR
 
-No requiere internet.
+## Cómo usar
+1. Abrí `index.html` localmente o publicalo en GitHub Pages.
+2. Cargá datos desde la app de IBKR.
+3. Mirá la calculadora y el resumen.
+
+## Campos clave de IBKR
+- Total Revenue (TTM)
+- EBIT (TTM)
+- Tax Rate (LFY)
+- Total Current Assets (LFY)
+- Total Current Liabilities (LFY)
+- Total Inventory (LFY)
+- CSH (LFY)
+- Total Debt (LFY)
+- Return On Investment (TTM)
+- Free Op. Cash Flow/Rev. (TTM)

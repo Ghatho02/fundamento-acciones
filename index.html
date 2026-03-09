@@ -1,1 +1,124 @@
-<html><body><h1>IBKR Analyzer</h1><p>Leer README.md</p></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IBKR Fundamental Analyzer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>IBKR Fundamental Analyzer</h1>
+    <p>Versión offline para análisis fundamental con campos tomados de IBKR.</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="ibkr">IBKR Input</button>
+    <button class="tab" data-tab="calc">Calculadora</button>
+    <button class="tab" data-tab="five">5 años</button>
+    <button class="tab" data-tab="summary">Resumen</button>
+    <button class="tab" data-tab="help">Ayuda</button>
+  </nav>
+
+  <main>
+    <section id="tab-ibkr" class="panel active">
+      <div class="toolbar">
+        <button id="fillExample">Cargar ejemplo KO</button>
+        <button id="clearAll">Limpiar</button>
+        <button id="exportJson">Exportar JSON</button>
+        <label class="import-label">Importar JSON <input id="importJson" type="file" accept=".json" hidden></label>
+      </div>
+      <table class="data-table" id="ibkrTable">
+        <thead>
+          <tr>
+            <th>Campo (IBKR)</th>
+            <th>Valor</th>
+            <th>Unidad</th>
+            <th>Sección IBKR</th>
+            <th>Para qué sirve</th>
+            <th>Notas</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="tab-calc" class="panel">
+      <h2>Calculadora automática</h2>
+      <table class="data-table" id="calcTable">
+        <thead>
+          <tr>
+            <th>Métrica</th>
+            <th>Valor</th>
+            <th>Unidad</th>
+            <th>Cómo se obtiene</th>
+            <th>Interpretación</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="tab-five" class="panel">
+      <h2>Carga a 5 años</h2>
+      <p class="muted">Completá FY-4 a FY. Se calcula promedio 5 años y CAGR de ventas.</p>
+      <table class="data-table" id="fiveTable">
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>FY-4</th>
+            <th>FY-3</th>
+            <th>FY-2</th>
+            <th>FY-1</th>
+            <th>FY</th>
+            <th>Prom. 5 años</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="card">
+        <strong>CAGR ventas 5 años:</strong> <span id="cagr5">—</span>
+      </div>
+    </section>
+
+    <section id="tab-summary" class="panel">
+      <div id="summaryCards" class="cards"></div>
+      <div class="card">
+        <h3>Veredicto</h3>
+        <div id="verdict" class="verdict">Completar datos</div>
+      </div>
+      <div class="card">
+        <h3>Semáforo</h3>
+        <ul id="trafficList"></ul>
+      </div>
+    </section>
+
+    <section id="tab-help" class="panel">
+      <h2>De dónde sale cada valor en IBKR</h2>
+      <p>Los nombres son los que aparecen en la app de IBKR, típicamente dentro de <strong>Empresa → Ratios</strong>.</p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Campo</th>
+            <th>Dónde aparece</th>
+            <th>Para qué se usa</th>
+          </tr>
+        </thead>
+        <tbody id="helpTable"></tbody>
+      </table>
+
+      <div class="card">
+        <h3>Fórmulas clave</h3>
+        <p><strong>Capital circulante neto</strong> = Current Assets − Current Liabilities</p>
+        <p><strong>Deuda neta</strong> = Total Debt − Cash</p>
+        <p><strong>NOPAT</strong> = EBIT × (1 − Tax Rate)</p>
+        <p><strong>Capital invertido aprox.</strong> = Debt + Equity − Cash</p>
+        <p><strong>ROIC aprox.</strong> = NOPAT ÷ Capital invertido</p>
+        <p><strong>ROIC − WACC</strong> = ROIC aprox. − WACC</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
