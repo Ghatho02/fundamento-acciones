@@ -9,7 +9,7 @@
 <body>
   <header>
     <h1>IBKR Fundamental Analyzer</h1>
-    <p>Versión offline para análisis fundamental con campos tomados de IBKR.</p>
+    <p>Calculadora offline para análisis fundamental usando campos de IBKR.</p>
   </header>
 
   <nav class="tabs">
@@ -34,7 +34,7 @@
             <th>Campo (IBKR)</th>
             <th>Valor</th>
             <th>Unidad</th>
-            <th>Sección IBKR</th>
+            <th>Dónde aparece</th>
             <th>Para qué sirve</th>
             <th>Notas</th>
           </tr>
@@ -61,7 +61,7 @@
 
     <section id="tab-five" class="panel">
       <h2>Carga a 5 años</h2>
-      <p class="muted">Completá FY-4 a FY. Se calcula promedio 5 años y CAGR de ventas.</p>
+      <p class="muted">Completá FY-4 a FY. Se calcula promedio 5 años, FCF/Ventas promedio y CAGR de ventas.</p>
       <table class="data-table" id="fiveTable">
         <thead>
           <tr>
@@ -88,14 +88,19 @@
         <div id="verdict" class="verdict">Completar datos</div>
       </div>
       <div class="card">
+        <h3>Quality score</h3>
+        <div id="score" class="metric">—</div>
+        <div id="scoreText" class="sub"></div>
+      </div>
+      <div class="card">
         <h3>Semáforo</h3>
         <ul id="trafficList"></ul>
       </div>
     </section>
 
     <section id="tab-help" class="panel">
-      <h2>De dónde sale cada valor en IBKR</h2>
-      <p>Los nombres son los que aparecen en la app de IBKR, típicamente dentro de <strong>Empresa → Ratios</strong>.</p>
+      <h2>De dónde sale cada dato en IBKR</h2>
+      <p>Los nombres coinciden con los que aparecen en la app de IBKR, normalmente dentro de <strong>Empresa → Ratios</strong>.</p>
       <table class="data-table">
         <thead>
           <tr>

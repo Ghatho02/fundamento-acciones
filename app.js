@@ -1,22 +1,22 @@
 
 const fields = [
   ["Empresa","text","General","Nombre de la empresa","Libre"],
-  ["Total Revenue (TTM)","number","Ratios > Statements","Ventas TTM","Base para crecimiento, FCF/ventas e inventarios/ventas"],
+  ["Total Revenue (TTM)","number","Empresa → Ratios → Statements","Ventas TTM","Base para crecimiento, FCF/ventas e inventarios/ventas"],
   ["Ventas año anterior","number","Manual / IBKR","Crecimiento YoY","Ingresar manualmente para crecimiento anual"],
-  ["EBIT (TTM)","number","Ratios > Statements","Resultado operativo","Base para NOPAT y ROIC"],
-  ["Tax Rate (LFY)","percent","Ratios > Statements","Tasa impositiva","Usar Tax Rate, no Tax Paid"],
-  ["Total Current Assets (LFY)","number","Ratios > Statements","Activos corrientes","Para capital circulante"],
-  ["Total Current Liabilities (LFY)","number","Ratios > Statements","Pasivos corrientes","Para capital circulante"],
-  ["Total Inventory (LFY)","number","Ratios > Statements","Inventario","Para inventarios/ventas"],
-  ["CSH (LFY)","number","Ratios > Statements","Caja","Para deuda neta y capital invertido"],
-  ["Total Debt (LFY)","number","Ratios > Statements","Deuda total","Para deuda neta y capital invertido"],
-  ["Total Equity (TTM) o Average Total Equity (TTM)","number","Ratios > Miscellaneous","Patrimonio","Preferir Total Equity; si no, Average Total Equity"],
-  ["Free Cash Flow (LFY)","number","Ratios > Statements","Flujo de caja libre","Para FCF/ventas"],
-  ["Net Debt - LFI (TTM)","number","Ratios > Statements","Deuda neta directa IBKR","Opcional, para comparar"],
-  ["Free Op. Cash Flow/Rev. (TTM)","percent","Ratios > Profitability","FCF/ventas directo IBKR","Opcional, para validar"],
-  ["Return On Avg Assets (TTM)","percent","Ratios > Management Effectiveness","ROA directo","Referencia"],
-  ["Return On Avg Equity (TTM)","percent","Ratios > Management Effectiveness","ROE directo","Referencia"],
-  ["Return On Investment (TTM)","percent","Ratios > Management Effectiveness","ROI (IBKR)","Comparar con ROIC aprox."],
+  ["EBIT (TTM)","number","Empresa → Ratios → Statements","Resultado operativo","Base para NOPAT y ROIC"],
+  ["Tax Rate (LFY)","percent","Empresa → Ratios → Statements","Tasa impositiva","Usar Tax Rate, no Tax Paid"],
+  ["Total Current Assets (LFY)","number","Empresa → Ratios → Statements","Activos corrientes","Para capital circulante"],
+  ["Total Current Liabilities (LFY)","number","Empresa → Ratios → Statements","Pasivos corrientes","Para capital circulante"],
+  ["Total Inventory (LFY)","number","Empresa → Ratios → Statements","Inventario","Para inventarios/ventas"],
+  ["CSH (LFY)","number","Empresa → Ratios → Statements","Caja","Para deuda neta y capital invertido"],
+  ["Total Debt (LFY)","number","Empresa → Ratios → Statements","Deuda total","Para deuda neta y capital invertido"],
+  ["Total Equity (TTM) o Average Total Equity (TTM)","number","Empresa → Ratios → Miscellaneous","Patrimonio","Preferir Total Equity; si no, Average Total Equity"],
+  ["Free Cash Flow (LFY)","number","Empresa → Ratios → Statements","Flujo de caja libre","Para FCF/ventas"],
+  ["Net Debt - LFI (TTM)","number","Empresa → Ratios → Statements","Deuda neta directa IBKR","Opcional, para comparar"],
+  ["Free Op. Cash Flow/Rev. (TTM)","percent","Empresa → Ratios → Profitability","FCF/ventas directo IBKR","Opcional, para validar"],
+  ["Return On Avg Assets (TTM)","percent","Empresa → Ratios → Management Effectiveness","ROA directo","Referencia"],
+  ["Return On Avg Equity (TTM)","percent","Empresa → Ratios → Management Effectiveness","ROE directo","Referencia"],
+  ["Return On Investment (TTM)","percent","Empresa → Ratios → Management Effectiveness","ROI (IBKR)","Comparar con ROIC aprox."],
   ["WACC","percent","Manual","Costo de capital","IBKR no lo muestra en estas pantallas"]
 ];
 
@@ -54,50 +54,47 @@ state.ibkr = state.ibkr || {};
 state.five = state.five || {};
 
 function save(){ localStorage.setItem("ibkr_analyzer_state", JSON.stringify(state)); }
+function toNum(v){ if (v === "" || v === null || v === undefined) return null; const n = Number(v); return Number.isFinite(n) ? n : null; }
+function fmtUSD(v){ if (v == null || Number.isNaN(v)) return "—"; return new Intl.NumberFormat("es-AR",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(v); }
+function fmtPct(v){ if (v == null || Number.isNaN(v)) return "—"; return v.toFixed(2) + "%"; }
+function avg(arr){ const vals = arr.filter(v => v != null && !Number.isNaN(v)); return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null; }
 
-function toNum(v){
-  if (v === "" || v === null || v === undefined) return null;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-function fmtUSD(v){
-  if (v == null || Number.isNaN(v)) return "—";
-  return new Intl.NumberFormat("es-AR",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(v);
-}
-function fmtPct(v){
-  if (v == null || Number.isNaN(v)) return "—";
-  return v.toFixed(2) + "%";
-}
-function avg(arr){
-  const vals = arr.filter(v => v != null && !Number.isNaN(v));
-  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
-}
-
-function renderIBKR(){
-  const tb = document.querySelector("#ibkrTable tbody");
-  const helpTb = document.querySelector("#helpTable");
-  tb.innerHTML = "";
-  helpTb.innerHTML = "";
-  fields.forEach(([name,type,section,purpose,note])=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${name}</td><td></td><td>${type==="percent"?"%":type==="number"?"USD":"texto"}</td><td>${section}</td><td>${purpose}</td><td>${note}</td>`;
-    const td = tr.children[1];
-    const input = document.createElement("input");
-    input.type = type === "text" ? "text" : "number";
-    input.step = "any";
-    input.value = state.ibkr[name] ?? "";
-    input.addEventListener("input", e => {
-      state.ibkr[name] = e.target.value;
-      save();
-      renderAll();
-    });
-    td.appendChild(input);
-    tb.appendChild(tr);
-
-    const trHelp = document.createElement("tr");
-    trHelp.innerHTML = `<td>${name}</td><td>${section}</td><td>${purpose}</td>`;
-    helpTb.appendChild(trHelp);
-  });
+function interpret(metric, v){
+  if (v == null || Number.isNaN(v)) return "";
+  switch(metric){
+    case "Capital circulante neto":
+      return v > 0 ? "Liquidez operativa positiva" : v < 0 ? "Liquidez de corto plazo ajustada" : "Equilibrado";
+    case "Deuda neta":
+      return v <= 0 ? "Más caja que deuda" : v < 10 ? "Deuda manejable" : "Revisar apalancamiento";
+    case "Deuda neta (IBKR directa)":
+      return "Dato directo de IBKR para comparar";
+    case "Inventarios / Ventas":
+      return v < 1 ? "Extraordinariamente eficiente" : v < 5 ? "Muy eficiente" : v < 10 ? "Normal" : "Negocio más intensivo en inventario";
+    case "FCF / Ventas":
+      return v > 15 ? "Excelente generación de caja" : v >= 10 ? "Buena generación de caja" : v >= 5 ? "Aceptable" : "Caja floja";
+    case "FCF / Ventas (IBKR directo)":
+      return "Validación contra el cálculo propio";
+    case "Crecimiento ingresos YoY":
+      return v > 10 ? "Crecimiento fuerte" : v >= 5 ? "Crecimiento moderado" : v >= 0 ? "Crecimiento bajo" : "Caída de ingresos";
+    case "NOPAT":
+      return "Beneficio operativo después de impuestos";
+    case "Capital invertido aprox.":
+      return "Capital real comprometido en el negocio";
+    case "ROIC aprox.":
+      return v > 20 ? "Negocio excelente" : v >= 15 ? "Negocio bueno" : v >= 10 ? "Negocio aceptable" : "Rentabilidad pobre";
+    case "ROI (IBKR)":
+      return v > 20 ? "Muy alto según IBKR" : v >= 15 ? "Bueno según IBKR" : "Más normal";
+    case "ROIC − WACC":
+      return v > 10 ? "Crea mucho valor" : v > 0 ? "Crea algo de valor" : "Destruye valor";
+    case "ROIC aprox. − ROI (IBKR)":
+      return "Sirve para comparar tu cálculo con el dato de IBKR";
+    case "ROA (IBKR)":
+      return v > 10 ? "Muy eficiente con sus activos" : v >= 5 ? "Buena eficiencia" : "Eficiencia modesta";
+    case "ROE (IBKR)":
+      return v > 20 ? "Muy rentable para accionistas" : v >= 15 ? "Buena rentabilidad" : "Rentabilidad más normal";
+    default:
+      return "";
+  }
 }
 
 function calculate(){
@@ -131,43 +128,62 @@ function calculate(){
   const roicWacc = (roic != null && wacc != null) ? roic - wacc : null;
   const roicVsRoi = (roic != null && roiIbkr != null) ? roic - roiIbkr : null;
 
-  return {
-    empresa: state.ibkr["Empresa"] || "—",
-    nwc, netDebt, invSales, fcfSales, growth, nopat, capitalInv, roic, roicWacc,
-    roiIbkr, roaIbkr, roeIbkr, fcfSalesIbkr, netDebtIbkr, roicVsRoi
-  };
+  return {empresa: state.ibkr["Empresa"] || "—", nwc, netDebt, invSales, fcfSales, growth, nopat, capitalInv, roic, roicWacc, roiIbkr, roaIbkr, roeIbkr, fcfSalesIbkr, netDebtIbkr, roicVsRoi};
+}
+
+function renderIBKR(){
+  const tb = document.querySelector("#ibkrTable tbody");
+  const helpTb = document.querySelector("#helpTable");
+  tb.innerHTML = "";
+  helpTb.innerHTML = "";
+  fields.forEach(([name,type,section,purpose,note])=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${name}</td><td></td><td>${type==="percent"?"%":type==="number"?"USD":"texto"}</td><td>${section}</td><td>${purpose}</td><td>${note}</td>`;
+    const td = tr.children[1];
+    const input = document.createElement("input");
+    input.type = type === "text" ? "text" : "number";
+    input.step = "any";
+    input.value = state.ibkr[name] ?? "";
+    input.addEventListener("input", e => { state.ibkr[name] = e.target.value; save(); renderAll(); });
+    td.appendChild(input);
+    tb.appendChild(tr);
+
+    const trHelp = document.createElement("tr");
+    trHelp.innerHTML = `<td>${name}</td><td>${section}</td><td>${purpose}</td>`;
+    helpTb.appendChild(trHelp);
+  });
 }
 
 function renderCalc(){
   const m = calculate();
   const rows = [
-    ["Empresa", m.empresa, "texto", "Nombre", ""],
-    ["Capital circulante neto", m.nwc, "USD", "Current Assets − Current Liabilities", m.nwc == null ? "" : (m.nwc > 0 ? "Positivo" : "Negativo")],
-    ["Deuda neta", m.netDebt, "USD", "Total Debt − Cash", ""],
-    ["Deuda neta (IBKR directa)", m.netDebtIbkr, "USD", "Net Debt - LFI (TTM)", "Comparación"],
-    ["Inventarios / Ventas", m.invSales, "%", "Inventory ÷ Revenue", m.invSales == null ? "" : (m.invSales < 5 ? "Muy eficiente" : "Más intensivo")],
-    ["FCF / Ventas", m.fcfSales, "%", "Free Cash Flow ÷ Revenue", ""],
-    ["FCF / Ventas (IBKR directo)", m.fcfSalesIbkr, "%", "Free Op. Cash Flow/Rev. (TTM)", "Validación"],
-    ["Crecimiento ingresos YoY", m.growth, "%", "Ventas TTM vs. año anterior", ""],
-    ["NOPAT", m.nopat, "USD", "EBIT × (1 − Tax Rate)", ""],
-    ["Capital invertido aprox.", m.capitalInv, "USD", "Debt + Equity − Cash", ""],
-    ["ROIC aprox.", m.roic, "%", "NOPAT ÷ Capital invertido", ""],
-    ["ROI (IBKR)", m.roiIbkr, "%", "Return On Investment (TTM)", ""],
-    ["ROIC − WACC", m.roicWacc, "%", "ROIC aprox. − WACC", ""],
-    ["ROIC aprox. − ROI (IBKR)", m.roicVsRoi, "%", "Comparación", ""],
-    ["ROA (IBKR)", m.roaIbkr, "%", "Return On Avg Assets (TTM)", ""],
-    ["ROE (IBKR)", m.roeIbkr, "%", "Return On Avg Equity (TTM)", ""]
+    ["Empresa", m.empresa, "texto", "Nombre"],
+    ["Capital circulante neto", m.nwc, "USD", "Current Assets − Current Liabilities"],
+    ["Deuda neta", m.netDebt, "USD", "Total Debt − Cash"],
+    ["Deuda neta (IBKR directa)", m.netDebtIbkr, "USD", "Net Debt - LFI (TTM)"],
+    ["Inventarios / Ventas", m.invSales, "%", "Inventory ÷ Revenue"],
+    ["FCF / Ventas", m.fcfSales, "%", "Free Cash Flow ÷ Revenue"],
+    ["FCF / Ventas (IBKR directo)", m.fcfSalesIbkr, "%", "Free Op. Cash Flow/Rev. (TTM)"],
+    ["Crecimiento ingresos YoY", m.growth, "%", "Ventas TTM vs. año anterior"],
+    ["NOPAT", m.nopat, "USD", "EBIT × (1 − Tax Rate)"],
+    ["Capital invertido aprox.", m.capitalInv, "USD", "Debt + Equity − Cash"],
+    ["ROIC aprox.", m.roic, "%", "NOPAT ÷ Capital invertido"],
+    ["ROI (IBKR)", m.roiIbkr, "%", "Return On Investment (TTM)"],
+    ["ROIC − WACC", m.roicWacc, "%", "ROIC aprox. − WACC"],
+    ["ROIC aprox. − ROI (IBKR)", m.roicVsRoi, "%", "Comparación"],
+    ["ROA (IBKR)", m.roaIbkr, "%", "Return On Avg Assets (TTM)"],
+    ["ROE (IBKR)", m.roeIbkr, "%", "Return On Avg Equity (TTM)"]
   ];
 
   const tb = document.querySelector("#calcTable tbody");
   tb.innerHTML = "";
-  rows.forEach(([label,val,unit,how,interp])=>{
+  rows.forEach(([label,val,unit,how])=>{
     const tr = document.createElement("tr");
     let shown = "—";
     if (unit === "USD") shown = fmtUSD(val);
     else if (unit === "%") shown = fmtPct(val);
     else shown = val ?? "—";
-    tr.innerHTML = `<td>${label}</td><td class="output">${shown}</td><td>${unit}</td><td>${how}</td><td>${interp}</td>`;
+    tr.innerHTML = `<td>${label}</td><td class="output">${shown}</td><td>${unit}</td><td>${how}</td><td>${interpret(label, val)}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -191,11 +207,7 @@ function renderFive(){
         input.type = "number";
         input.step = "any";
         input.value = state.five[`${name}_${i}`] ?? "";
-        input.addEventListener("input", e=>{
-          state.five[`${name}_${i}`] = e.target.value;
-          save();
-          renderAll();
-        });
+        input.addEventListener("input", e=>{ state.five[`${name}_${i}`] = e.target.value; save(); renderAll(); });
         td.appendChild(input);
         tr.appendChild(td);
       });
@@ -264,11 +276,27 @@ function renderSummary(){
   verdictEl.textContent = verdict;
   verdictEl.className = `verdict ${vClass}`;
 
+  let score = 0;
+  if (m.roic != null){ if (m.roic > 20) score += 2; else if (m.roic >= 15) score += 1; }
+  if (m.fcfSales != null){ if (m.fcfSales > 15) score += 2; else if (m.fcfSales >= 10) score += 1; }
+  if (m.netDebt != null){ if (m.netDebt <= 0) score += 2; else if (m.netDebt < 10) score += 1; }
+  if (m.growth != null){ if (m.growth > 10) score += 2; else if (m.growth >= 5) score += 1; }
+  if (m.roeIbkr != null){ if (m.roeIbkr > 20) score += 1; }
+  if (m.roaIbkr != null){ if (m.roaIbkr > 10) score += 1; }
+
+  document.getElementById("score").textContent = `${score}/10`;
+  document.getElementById("scoreText").textContent =
+    score >= 8 ? "Perfil de calidad alto" :
+    score >= 5 ? "Perfil intermedio" :
+    "Perfil flojo o incompleto";
+
   const traffic = [
     ["ROIC aprox.", m.roic, m.roic > 20 ? "Verde" : m.roic >= 15 ? "Amarillo" : "Rojo"],
     ["FCF / Ventas", m.fcfSales, m.fcfSales > 15 ? "Verde" : m.fcfSales >= 10 ? "Amarillo" : "Rojo"],
     ["Deuda neta", m.netDebt, m.netDebt <= 0 ? "Verde" : "Amarillo"],
-    ["Crec. ingresos YoY", m.growth, m.growth > 10 ? "Verde" : m.growth >= 5 ? "Amarillo" : "Rojo"]
+    ["Crec. ingresos YoY", m.growth, m.growth > 10 ? "Verde" : m.growth >= 5 ? "Amarillo" : "Rojo"],
+    ["ROE (IBKR)", m.roeIbkr, m.roeIbkr > 20 ? "Verde" : m.roeIbkr >= 15 ? "Amarillo" : "Rojo"],
+    ["ROA (IBKR)", m.roaIbkr, m.roaIbkr > 10 ? "Verde" : m.roaIbkr >= 5 ? "Amarillo" : "Rojo"]
   ];
   const ul = document.getElementById("trafficList");
   ul.innerHTML = "";
@@ -279,12 +307,7 @@ function renderSummary(){
   });
 }
 
-function renderAll(){
-  renderIBKR();
-  renderCalc();
-  renderFive();
-  renderSummary();
-}
+function renderAll(){ renderIBKR(); renderCalc(); renderFive(); renderSummary(); }
 
 document.querySelectorAll(".tab").forEach(btn=>{
   btn.addEventListener("click", ()=>{
@@ -295,19 +318,8 @@ document.querySelectorAll(".tab").forEach(btn=>{
   });
 });
 
-document.getElementById("fillExample").addEventListener("click", ()=>{
-  state.ibkr = {...state.ibkr, ...exampleKO};
-  save();
-  renderAll();
-});
-
-document.getElementById("clearAll").addEventListener("click", ()=>{
-  state.ibkr = {};
-  state.five = {};
-  save();
-  renderAll();
-});
-
+document.getElementById("fillExample").addEventListener("click", ()=>{ state.ibkr = {...state.ibkr, ...exampleKO}; save(); renderAll(); });
+document.getElementById("clearAll").addEventListener("click", ()=>{ state.ibkr = {}; state.five = {}; save(); renderAll(); });
 document.getElementById("exportJson").addEventListener("click", ()=>{
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
   const a = document.createElement("a");
@@ -315,11 +327,7 @@ document.getElementById("exportJson").addEventListener("click", ()=>{
   a.download = "ibkr_analyzer_data.json";
   a.click();
 });
-
-document.querySelector(".import-label").addEventListener("click", ()=>{
-  document.getElementById("importJson").click();
-});
-
+document.querySelector(".import-label").addEventListener("click", ()=>{ document.getElementById("importJson").click(); });
 document.getElementById("importJson").addEventListener("change", async (e)=>{
   const file = e.target.files[0];
   if (!file) return;
