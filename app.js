@@ -28,7 +28,7 @@ const fiveRows = [
   ["FCF / Ventas","formula"]
 ];
 
-const exampleKO = {
+const exampleData = {
   "Empresa":"Coca-Cola",
   "Total Revenue (TTM)":47.94,
   "Ventas año anterior":47.06,
@@ -49,11 +49,11 @@ const exampleKO = {
   "WACC":8
 };
 
-const state = JSON.parse(localStorage.getItem("ibkr_analyzer_state") || "{}");
+const state = JSON.parse(localStorage.getItem("ibkr_analyzer_state_v_final") || "{}");
 state.ibkr = state.ibkr || {};
 state.five = state.five || {};
 
-function save(){ localStorage.setItem("ibkr_analyzer_state", JSON.stringify(state)); }
+function save(){ localStorage.setItem("ibkr_analyzer_state_v_final", JSON.stringify(state)); }
 function toNum(v){ if (v === "" || v === null || v === undefined) return null; const n = Number(v); return Number.isFinite(n) ? n : null; }
 function fmtUSD(v){ if (v == null || Number.isNaN(v)) return "—"; return new Intl.NumberFormat("es-AR",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(v); }
 function fmtPct(v){ if (v == null || Number.isNaN(v)) return "—"; return v.toFixed(2) + "%"; }
@@ -65,11 +65,11 @@ function interpret(metric, v){
     case "Capital circulante neto":
       return v > 0 ? "Liquidez operativa positiva" : v < 0 ? "Liquidez de corto plazo ajustada" : "Equilibrado";
     case "Deuda neta":
-      return v <= 0 ? "Más caja que deuda" : v < 10 ? "Deuda manejable" : "Revisar apalancamiento";
+      return v <= 0 ? "Más caja que deuda" : v < 10 ? "Deuda manejable" : "Apalancamiento más alto";
     case "Deuda neta (IBKR directa)":
       return "Dato directo de IBKR para comparar";
     case "Inventarios / Ventas":
-      return v < 1 ? "Extraordinariamente eficiente" : v < 5 ? "Muy eficiente" : v < 10 ? "Normal" : "Negocio más intensivo en inventario";
+      return v < 1 ? "Extraordinariamente eficiente" : v < 5 ? "Muy eficiente" : v < 10 ? "Normal" : "Negocio intensivo en inventario";
     case "FCF / Ventas":
       return v > 15 ? "Excelente generación de caja" : v >= 10 ? "Buena generación de caja" : v >= 5 ? "Aceptable" : "Caja floja";
     case "FCF / Ventas (IBKR directo)":
@@ -83,15 +83,15 @@ function interpret(metric, v){
     case "ROIC aprox.":
       return v > 20 ? "Negocio excelente" : v >= 15 ? "Negocio bueno" : v >= 10 ? "Negocio aceptable" : "Rentabilidad pobre";
     case "ROI (IBKR)":
-      return v > 20 ? "Muy alto según IBKR" : v >= 15 ? "Bueno según IBKR" : "Más normal";
+      return v > 20 ? "Muy alto según IBKR" : v >= 15 ? "Bueno según IBKR" : v >= 10 ? "Aceptable según IBKR" : "Bajo según IBKR";
     case "ROIC − WACC":
       return v > 10 ? "Crea mucho valor" : v > 0 ? "Crea algo de valor" : "Destruye valor";
     case "ROIC aprox. − ROI (IBKR)":
-      return "Sirve para comparar tu cálculo con el dato de IBKR";
+      return "Diferencia entre cálculo propio y dato de IBKR";
     case "ROA (IBKR)":
       return v > 10 ? "Muy eficiente con sus activos" : v >= 5 ? "Buena eficiencia" : "Eficiencia modesta";
     case "ROE (IBKR)":
-      return v > 20 ? "Muy rentable para accionistas" : v >= 15 ? "Buena rentabilidad" : "Rentabilidad más normal";
+      return v > 20 ? "Muy rentable para accionistas" : v >= 15 ? "Buena rentabilidad" : v >= 10 ? "Rentabilidad aceptable" : "Rentabilidad baja";
     default:
       return "";
   }
@@ -223,7 +223,12 @@ function renderFive(){
   const rev0 = toNum(state.five["Revenue (Ventas)_0"]);
   const rev4 = toNum(state.five["Revenue (Ventas)_4"]);
   const cagr = (rev0 && rev4) ? ((rev4 / rev0) ** (1/4) - 1) * 100 : null;
+  const fcfVals = [0,1,2,3,4].map(i => toNum(state.five[`Free Cash Flow_${i}`]));
+  const revVals = [0,1,2,3,4].map(i => toNum(state.five[`Revenue (Ventas)_${i}`]));
+  const fcfMargins = fcfVals.map((f,i) => (f != null && revVals[i]) ? f / revVals[i] * 100 : null);
+
   document.getElementById("cagr5").textContent = fmtPct(cagr);
+  document.getElementById("fcfMargin5").textContent = fmtPct(avg(fcfMargins));
 }
 
 function statusClass(kind, value){
@@ -232,6 +237,8 @@ function statusClass(kind, value){
   if (kind === "fcf") return value > 15 ? "ok" : value >= 10 ? "warn" : "bad";
   if (kind === "growth") return value > 10 ? "ok" : value >= 5 ? "warn" : "bad";
   if (kind === "debt") return value <= 0 ? "ok" : "warn";
+  if (kind === "roe") return value > 20 ? "ok" : value >= 15 ? "warn" : "bad";
+  if (kind === "roa") return value > 10 ? "ok" : value >= 5 ? "warn" : "bad";
   return "";
 }
 
@@ -242,10 +249,10 @@ function renderSummary(){
     ["ROIC aprox.", m.roic, "%", statusClass("roic", m.roic)],
     ["ROI (IBKR)", m.roiIbkr, "%", ""],
     ["FCF / Ventas", m.fcfSales, "%", statusClass("fcf", m.fcfSales)],
-    ["FCF/Ventas IBKR", m.fcfSalesIbkr, "%", ""],
     ["Deuda neta", m.netDebt, "USD", statusClass("debt", m.netDebt)],
     ["Crec. ingresos YoY", m.growth, "%", statusClass("growth", m.growth)],
-    ["Capital circulante neto", m.nwc, "USD", ""]
+    ["ROE (IBKR)", m.roeIbkr, "%", statusClass("roe", m.roeIbkr)],
+    ["ROA (IBKR)", m.roaIbkr, "%", statusClass("roa", m.roaIbkr)]
   ];
 
   const wrap = document.getElementById("summaryCards");
@@ -272,17 +279,16 @@ function renderSummary(){
       vClass = "bad";
     }
   }
-  const verdictEl = document.getElementById("verdict");
-  verdictEl.textContent = verdict;
-  verdictEl.className = `verdict ${vClass}`;
+  document.getElementById("verdict").textContent = verdict;
+  document.getElementById("verdict").className = `verdict ${vClass}`;
 
   let score = 0;
   if (m.roic != null){ if (m.roic > 20) score += 2; else if (m.roic >= 15) score += 1; }
   if (m.fcfSales != null){ if (m.fcfSales > 15) score += 2; else if (m.fcfSales >= 10) score += 1; }
   if (m.netDebt != null){ if (m.netDebt <= 0) score += 2; else if (m.netDebt < 10) score += 1; }
   if (m.growth != null){ if (m.growth > 10) score += 2; else if (m.growth >= 5) score += 1; }
-  if (m.roeIbkr != null){ if (m.roeIbkr > 20) score += 1; }
-  if (m.roaIbkr != null){ if (m.roaIbkr > 10) score += 1; }
+  if (m.roeIbkr != null && m.roeIbkr > 20) score += 1;
+  if (m.roaIbkr != null && m.roaIbkr > 10) score += 1;
 
   document.getElementById("score").textContent = `${score}/10`;
   document.getElementById("scoreText").textContent =
@@ -318,7 +324,7 @@ document.querySelectorAll(".tab").forEach(btn=>{
   });
 });
 
-document.getElementById("fillExample").addEventListener("click", ()=>{ state.ibkr = {...state.ibkr, ...exampleKO}; save(); renderAll(); });
+document.getElementById("fillExample").addEventListener("click", ()=>{ state.ibkr = {...state.ibkr, ...exampleData}; save(); renderAll(); });
 document.getElementById("clearAll").addEventListener("click", ()=>{ state.ibkr = {}; state.five = {}; save(); renderAll(); });
 document.getElementById("exportJson").addEventListener("click", ()=>{
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});

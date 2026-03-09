@@ -1,11 +1,17 @@
 # IBKR Fundamental Analyzer
 
-Versión offline para subir a GitHub Pages.
+Versión final offline para GitHub Pages.
 
 ## Incluye
-- interpretaciones automáticas completas
-- semáforo
-- quality score
-- resumen
-- carga de 5 años
-- explicación de dónde sale cada campo en IBKR
+- IBKR Input
+- Calculadora con interpretación completa
+- Carga a 5 años
+- Resumen con semáforo
+- Quality score
+- Ayuda con origen de cada campo en IBKR
+
+## Archivos a reemplazar en GitHub
+- index.html
+- app.js
+- styles.css
+- README.md

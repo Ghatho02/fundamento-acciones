@@ -1,15 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>IBKR Fundamental Analyzer</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
     <h1>IBKR Fundamental Analyzer</h1>
-    <p>Calculadora offline para análisis fundamental usando campos de IBKR.</p>
+    <p>Calculadora offline para análisis fundamental con campos tomados de IBKR.</p>
   </header>
 
   <nav class="tabs">
@@ -23,7 +23,7 @@
   <main>
     <section id="tab-ibkr" class="panel active">
       <div class="toolbar">
-        <button id="fillExample">Cargar ejemplo KO</button>
+        <button id="fillExample">Cargar ejemplo</button>
         <button id="clearAll">Limpiar</button>
         <button id="exportJson">Exportar JSON</button>
         <label class="import-label">Importar JSON <input id="importJson" type="file" accept=".json" hidden></label>
@@ -76,21 +76,30 @@
         </thead>
         <tbody></tbody>
       </table>
-      <div class="card">
-        <strong>CAGR ventas 5 años:</strong> <span id="cagr5">—</span>
+      <div class="cards">
+        <div class="card">
+          <h3>CAGR ventas 5 años</h3>
+          <div class="metric" id="cagr5">—</div>
+        </div>
+        <div class="card">
+          <h3>FCF / Ventas promedio 5 años</h3>
+          <div class="metric" id="fcfMargin5">—</div>
+        </div>
       </div>
     </section>
 
     <section id="tab-summary" class="panel">
       <div id="summaryCards" class="cards"></div>
-      <div class="card">
-        <h3>Veredicto</h3>
-        <div id="verdict" class="verdict">Completar datos</div>
-      </div>
-      <div class="card">
-        <h3>Quality score</h3>
-        <div id="score" class="metric">—</div>
-        <div id="scoreText" class="sub"></div>
+      <div class="cards">
+        <div class="card">
+          <h3>Veredicto</h3>
+          <div id="verdict" class="verdict">Completar datos</div>
+        </div>
+        <div class="card">
+          <h3>Quality score</h3>
+          <div id="score" class="metric">—</div>
+          <div id="scoreText" class="sub"></div>
+        </div>
       </div>
       <div class="card">
         <h3>Semáforo</h3>
@@ -116,6 +125,8 @@
         <h3>Fórmulas clave</h3>
         <p><strong>Capital circulante neto</strong> = Current Assets − Current Liabilities</p>
         <p><strong>Deuda neta</strong> = Total Debt − Cash</p>
+        <p><strong>Inventarios / Ventas</strong> = Inventory ÷ Revenue</p>
+        <p><strong>FCF / Ventas</strong> = Free Cash Flow ÷ Revenue</p>
         <p><strong>NOPAT</strong> = EBIT × (1 − Tax Rate)</p>
         <p><strong>Capital invertido aprox.</strong> = Debt + Equity − Cash</p>
         <p><strong>ROIC aprox.</strong> = NOPAT ÷ Capital invertido</p>
